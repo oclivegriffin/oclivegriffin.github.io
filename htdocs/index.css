@@ -1,0 +1,124 @@
+body {
+    /* display: flex;
+    justify-content: center; */
+    font-family: Arial, Helvetica, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    /* font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; */
+    line-height: 1.6;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+}
+
+/* Math styles */
+.math {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+mjx-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+@media screen and (max-width: 768px) {
+    .container {
+        width: 100%;
+        padding: 20px;
+    }
+}
+
+.math-container {
+    cursor: pointer;
+    transition: opacity 0.2s;
+    position: relative;
+}
+
+/* Inline math specific styles */
+.math-inline {
+    display: inline;
+}
+
+.math-inline .copy-icon {
+    transform: translate(4px, -8px);
+}
+
+/* Block math specific styles */
+.math-block {
+    display: block;
+    text-align: center;
+}
+
+.math-block .copy-icon {
+    top: 0;
+    right: 0;
+    margin: 4px;
+}
+
+.copy-icon {
+    display: none;
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    opacity: 0.6;
+}
+
+.math-container:hover {
+    opacity: 0.6;
+}
+
+.math-container:hover .copy-icon {
+    display: inline;
+}
+
+
+/* For norms post - need to find a better way to attach css to posts */
+/* Loading spinner styles */
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.graph-container {
+    position: relative;
+}
+
+.graph-container iframe {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.graph-container iframe.loaded {
+    opacity: 1;
+}
+
+.graph-container::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50px;
+    height: 50px;
+    margin: -25px 0 0 -25px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #646464;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 1;
+}
+
+.graph-container.loaded::before {
+    display: none;
+}
+
+/* end norms post */

@@ -1,0 +1,60 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deep learning Links</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']],
+                processEscapes: true
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async 
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+
+    <!-- Copy to clipboard -->
+    <script>
+        function copyMathToClipboard(element) {
+            const latex = element.getAttribute('data-latex');
+            navigator.clipboard.writeText(latex).then(() => {
+                element.style.opacity = '0.5';
+                setTimeout(() => element.style.opacity = '1', 200);
+            });
+        }
+    </script>
+</head>
+<body>
+    <p><strong><a href="./index.html">home</a></strong></p>
+<h1>Deep learning Links</h1>
+<p>A messy collection of resources that helped me. Not exhaustive at all. Publishing this so I have incentive to continue recording to it</p>
+<h3>Generally great resources:</h3>
+<ul>
+<li><a href="https://lilianweng.github.io/lil-log/">Lilian Weng&#39;s Blog</a></li>
+<li><a href="https://fleuret.org/public/lbdl.pdf">Little Book of Deep Learning</a> - François Fleuret</li>
+<li><a href="https://www.youtube.com/playlist?list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ">Neural Networks: Zero to hero</a> - Andrej Karpathy</li>
+</ul>
+<h3>Transformers</h3>
+<ul>
+<li><a href="http://jalammar.github.io/illustrated-transformer/">Illustrated Transformer</a> - Jay Alammar</li>
+<li><a href="https://www.youtube.com/watch?v=kCc8FmEb1nY&list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ&index=7">GPT from scratch</a> - Andrej Karpathy</li>
+</ul>
+<h2>Maths</h2>
+<h3>KL divergence</h3>
+<ul>
+<li>Intuition: <a href="https://www.youtube.com/watch?v=SxGYPqCgJWM">https://www.youtube.com/watch?v=SxGYPqCgJWM</a></li>
+<li>As a motivation for cross entropy loss: <a href="https://www.youtube.com/watch?v=Pwgpl9mKars">https://www.youtube.com/watch?v=Pwgpl9mKars</a></li>
+</ul>
+
+</body>
+</html> 

@@ -1,0 +1,65 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Oli Clive-Griffin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']],
+                processEscapes: true
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async 
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+
+    <!-- Copy to clipboard -->
+    <script>
+        function copyMathToClipboard(element) {
+            const latex = element.getAttribute('data-latex');
+            navigator.clipboard.writeText(latex).then(() => {
+                element.style.opacity = '0.5';
+                setTimeout(() => element.style.opacity = '1', 200);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Oli Clive-Griffin</h1>
+<p><a href="https://github.com/oli-clive-griffin">Github</a>, <a href="./pub/Oliver_Clive-Griffin_CV.pdf">CV</a>, <a href="mailto:o.clivegriffin@gmail.com">o.clivegriffin@gmail.com</a></p>
+<p>I&#39;m currently on sabbatical, self-studying AI safety research engineering. I&#39;m particularly interested in mechanistic interpretability.</p>
+<!-- ### Posts
+- [The geometry of LayerNorm and RMSNorm](./ln.html) - A geometric perspective on LayerNorm and RMSNorm, exploring how they project vectors onto hyperspheres.
+
+### Notes
+- [SAE notes](./sae-notes.html) - Notes and resources on SAEs -->
+
+<h3>Research / ML</h3>
+<ul>
+<li><a href="https://github.com/model-diffing/model-diffing">Model Diffing</a> - A library for training Sparse Crosscoders, Transcoders, and SAEs. Supports SOTA training methods (<a href="https://arxiv.org/abs/2407.14435">JumpRelu</a>, <a href="https://arxiv.org/pdf/2412.06410">(Batch)</a><a href="https://arxiv.org/abs/2406.04093v1">TopK</a>, <a href="https://arxiv.org/abs/2501.18823">Skip Transcoders</a>, etc).</li>
+<li><a href="https://www.apartresearch.com/project/classification-on-latent-feature-activation-for-detecting-adversarial-prompt-vulnerabilities">Detecting Successful Adversarial Prompting From SAE Activations</a> - Won 2nd place in <a href="https://www.apartresearch.com/">Apart Research</a> and <a href="https://goodfire.ai/">Goodfire&#39;s</a> &quot;Reprogramming AI Models&quot; research sprint.</li>
+<li><a href="https://docs.google.com/document/d/1zxH7eVnaIqCe8lV0tVrQvMqHesUPTQStsSooiArkPXg">My Application to Neel Nanda&#39;s MATS stream</a> - Investigating use of for-loop variables in toy language models. (i.e. <code>for (int i = 0; </code> should predict <code>i</code> as the next token)</li>
+<li>My <a href="https://github.com/oli-clive-griffin/ARENA_3.0">solutions</a> for <a href="https://www.arena.education/">ARENA 3.0</a></li>
+</ul>
+<!-- - [From scratch GPT implementation](https://github.com/oli-clive-griffin/transformer-from-scratch) -->
+
+<h3>Code</h3>
+<ul>
+<li><a href="https://github.com/oli-clive-griffin/rusp">Rusp</a> - A lisp interpreter and Bytecode Compiler/VM written in Rust (name suggestions welcome)</li>
+<li><a href="https://github.com/oli-clive-griffin/rax">Rax</a> - A small deep learning library able to train neural networks in less than 1000 lines of dependency free Rust.</li>
+<li><a href="https://github.com/oli-clive-griffin/einchain">Einchain</a> - expressive method chaining for einsum ops</li>
+<li><a href="https://github.com/oli-clive-griffin/conway3d">Conway&#39;s game of life</a> in 3D</li>
+</ul>
+
+</body>
+</html> 

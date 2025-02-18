@@ -1,0 +1,208 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>The Geometry of LayerNorm and RMSNorm</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']],
+                processEscapes: true
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async 
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+
+    <!-- Copy to clipboard -->
+    <script>
+        function copyMathToClipboard(element) {
+            const latex = element.getAttribute('data-latex');
+            navigator.clipboard.writeText(latex).then(() => {
+                element.style.opacity = '0.5';
+                setTimeout(() => element.style.opacity = '1', 200);
+            });
+        }
+    </script>
+</head>
+<body>
+    <p><strong><a href="./index.html">home</a></strong></p>
+<h1>The Geometry of LayerNorm and RMSNorm</h1>
+<p>This was originally written as the answer to a question applying to Stefan Heimersheim&#39;s <a href="https://www.cambridgeaisafety.org/mars">MARS</a> stream. I learnt a lot researching it and thought it was worth sharing.</p>
+<p>It&#39;s also heavily inspired by the excellent paper: <a href="https://arxiv.org/abs/2405.04134">Geometry and Dynamics of LayerNorm</a> by Paul M. Riechers. What&#39;s good about this post is stolen from there. My main contribution is to attempt to extend the geometric intuition to RMSNorm.</p>
+<p>This post assumes a basic understanding of <a href="https://www.youtube.com/watch?v=wjZofJX0v4M&list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi">transformer models</a> and <a href="https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab">linear algebra</a>.</p>
+<p>Also: all math on this page can be copied in <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$\LaTeX$">\(\LaTeX\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span> notation by clicking it</p>
+<br>
+
+<hr>
+<br>
+
+<p>LayerNorm is often framed statistically, but there&#39;s an equally valid geometric interpretation that&#39;s pretty neat. Let&#39;s discard this statistical framing and rethink it as a sequence of geometric transformations on an activation vector. In doing so we&#39;ll see some cool parallels between LayerNorm and RMSNorm.</p>
+<p>For an input vector <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$x = (x_1, ..., x_n)$">\(x = (x_1, ..., x_n)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>, LayerNorm is calculated as</p>
+<p><span class="math-container math-block" onclick="copyMathToClipboard(this)" data-latex="$\text{LayerNorm}(x) = \left(\frac{x - \text{mean}(x)}{\text{std}(x)}\right) \odot \gamma + \beta$">\[\text{LayerNorm}(x) = \left(\frac{x - \text{mean}(x)}{\text{std}(x)}\right) \odot \gamma + \beta\]<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span></p>
+<p>where <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$\gamma$">\(\gamma\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span> and <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$\beta$">\(\beta\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span> are parameter vectors of shape <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(d_{\text{model}},)$">\((d_{\text{model}},)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>.</p>
+<p>We can reframe this as a sequence of operations on the input vector:</p>
+<p><em>(this is easier to illustrate in python than in maths)</em></p>
+<pre><code class="language-python">def subtract_mean(x): return x - mean(x)
+def divide_by_std(x): return x / std(x)
+def affine(x): return x * GAMMA + BETA
+
+def layer_norm(x):
+    x =  subtract_mean(x)
+    x = divide_by_std(x)
+    x = affine(x)
+    return x
+</code></pre>
+<p>Next, let&#39;s think about how each of these steps act geometrically on vectors in activation space.</p>
+<h3>Subtracting the mean</h3>
+<p>To frame subtracting the mean as a linear transformation, let&#39;s first find a linear transformation that produces an n-dimensional vector of <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(\text{mean}(x), \text{mean}(x), ..., \text{mean}(x))$">\((\text{mean}(x), \text{mean}(x), ..., \text{mean}(x))\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>. This way we can simply subtract it.</p>
+<p>We can write an <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$n \times n$">\(n \times n\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span> matrix to do this operation as so:<br><span class="math-container math-block" onclick="copyMathToClipboard(this)" data-latex="$\frac{1}{n}\begin{bmatrix} 1 & 1 & \cdots & 1 \\ 1 & 1 & \cdots & 1 \\ \vdots & \vdots & \ddots & \vdots \\ 1 & 1 & \cdots & 1 \end{bmatrix}_{n \times n}$">\[\frac{1}{n}\begin{bmatrix} 1 & 1 & \cdots & 1 \\ 1 & 1 & \cdots & 1 \\ \vdots & \vdots & \ddots & \vdots \\ 1 & 1 & \cdots & 1 \end{bmatrix}_{n \times n}\]<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span><br>For example, given an input vector <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$x = (0, 1, 5)$">\(x = (0, 1, 5)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span><br><span class="math-container math-block" onclick="copyMathToClipboard(this)" data-latex="$\text{MeanVector}(x) = \frac{1}{3}\begin{bmatrix} 1 & 1 & 1 \\ 1 & 1 & 1 \\ 1 & 1 & 1 \end{bmatrix} x = \begin{bmatrix} 2 \\ 2 \\ 2 \end{bmatrix}$">\[\text{MeanVector}(x) = \frac{1}{3}\begin{bmatrix} 1 & 1 & 1 \\ 1 & 1 & 1 \\ 1 & 1 & 1 \end{bmatrix} x = \begin{bmatrix} 2 \\ 2 \\ 2 \end{bmatrix}\]<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span><br>This transformation projects points onto the main diagonal of the space. (the line/1d subspace where all components are equal)</p>
+<p>This is just the mean operation though. LayerNorm <em>subtracts</em> this mean. Because applying <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$\text{MeanVector}$">\(\text{MeanVector}\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span> projects vectors onto the main diagonal - a 1d subspace - subtracting <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$\text{MeanVector}(x)$">\(\text{MeanVector}(x)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span> from a vector projects it onto an <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n-1)$">\((n-1)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>d subspace orthogonal to the main diagonal - the zero-sum hyperplane. This make sense because a vector with mean of zero also has a sum of zero. So geometrically, we can think subtracting a vector&#39;s mean as squishing space along the direction of the main diagonal, onto the zero-sum hyperplane<sup><a id="footnote-ref-3" href="#footnote-3" data-footnote-ref aria-describedby="footnote-label">1</a></sup>.</p>
+<p>After being projected onto this hyperplane, we divide by the standard deviation. While it&#39;s not very intuitive from the perspective of element-wise division, this actually has the effect of scaling the vector so that it lies on a circular space. Specifically vectors are scaled so that they lie on the intersection between the zero-sum hyperplane and a hypersphere with radius <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$\sqrt{n}$">\(\sqrt{n}\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>. This intersection is called an <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n-2)$">\((n-2)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>sphere: a hypersphere embedded in the zero-sum hyperplane. <sup><a id="footnote-ref-2" href="#footnote-2" data-footnote-ref aria-describedby="footnote-label">2</a></sup></p>
+<div class="graph-container" style="
+    width: 70vw;
+    margin: 0 auto;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+">
+    <iframe src="./public/layernorm_0.html" frameborder="0" style="width: 100%; aspect-ratio: 1;"></iframe>
+    <iframe src="./public/layernorm_1.html" frameborder="0" style="width: 100%; aspect-ratio: 1;"></iframe>
+    <iframe src="./public/layernorm_2.html" frameborder="0" style="width: 100%; aspect-ratio: 1;"></iframe>
+</div>
+
+<blockquote>
+<p>example: in 3d, subtracting the mean of a vector projects it onto a 2d subspace (plane), dividing by it&#39;s std then scales it so that it lies on a circle on that hyperplane.<br>Note: because we usually divide by std <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$+\epsilon$">\(+\epsilon\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>, features actually lie very slightly inside the <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n-2)$">\((n-2)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>sphere mentioned before, but I don&#39;t believe this is central to the intuition here so will be skipping over it.</p>
+</blockquote>
+<p>The remaining operation is an element-wise scaling and bias. We can think about this as stretching or compressing the <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n-2)$">\((n-2)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>sphere along the the canonical basis dimensions, then shifting it by some fixed offset vector. This is simply an affine function, albeit a restricted one, due to the scaling being element-wise.</p>
+<div class="graph-container" style="
+    width: 70vw;
+    margin: 0 auto;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+">
+    <iframe src="public/layernorm_3.html" frameborder="0" style="width: 100%; aspect-ratio: 1;"></iframe>
+    <iframe src="public/layernorm_4.html" frameborder="0" style="width: 100%; aspect-ratio: 1;"></iframe>
+</div>
+
+
+<h2>RMSNorm</h2>
+<p>RMSNorm&#39;s geometric effect echos LayerNorms, but is simpler and less geometrically restrictive. First, let&#39;s define RMSNorm:</p>
+<p>For an input vector <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$x = (x_1, ..., x_n)$">\(x = (x_1, ..., x_n)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>, RMSNorm is calculated as:<br><span class="math-container math-block" onclick="copyMathToClipboard(this)" data-latex="$
+\text{RMSNorm}(x) = \frac{x}{\text{rms}(x)} \odot \gamma
+$">\[
+\text{RMSNorm}(x) = \frac{x}{\text{rms}(x)} \odot \gamma
+\]<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span><br>Where:<br><span class="math-container math-block" onclick="copyMathToClipboard(this)" data-latex="$
+\text{rms}(x) = \sqrt{\frac{1}{n}\sum_{i=1}^n x_i^2}
+$">\[
+\text{rms}(x) = \sqrt{\frac{1}{n}\sum_{i=1}^n x_i^2}
+\]<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span></p>
+<p>Once again, let&#39;s reframe this as a series of transformations which we can think of geometrically:</p>
+<pre><code class="language-python">def divide_by_rms(x) = x / sqrt(mean(square(x)))
+def scale(x) = x * gamma
+
+def rms_norm(x):
+    x = divide_by_rms(x)
+    x = scale(x)
+    return x
+</code></pre>
+<p>Geometrically, dividing by <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$\text{rms}(x)$">\(\text{rms}(x)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span> has the effect of normalising a vector to magnitude <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$\sqrt{d}$">\(\sqrt{d}\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>. we then multiply it element-wise with <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$\gamma$">\(\gamma\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span> which can be seen geometrically as scaling in the canonical basis.</p>
+<p>The normalisation to magnitude <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$\sqrt{d}$">\(\sqrt{d}\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span> can be seen geometrically as &quot;projecting&quot; the vector onto a hypersphere (aka an <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n-1)$">\((n-1)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>sphere<sup><a id="footnote-ref-1" href="#footnote-1" data-footnote-ref aria-describedby="footnote-label">3</a></sup>) of radius <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$\sqrt{d}$">\(\sqrt{d}\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>. We then apply an element-wise scaling as in LayerNorm, but no shift.</p>
+<div class="graph-container" style="
+    width: 60vw;
+    margin: 0 auto;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+">
+    <iframe src="public/rmsnorm_0.html" frameborder="0" style="width: 100%; aspect-ratio: 1;"></iframe>
+    <iframe src="public/rmsnorm_1.html" frameborder="0" style="width: 100%; aspect-ratio: 1;"></iframe>
+    <iframe src="public/rmsnorm_2.html" frameborder="0" style="width: 100%; aspect-ratio: 1;"></iframe>
+</div>
+
+<blockquote>
+<p>RMS norm first scales vectors onto a hypersphere of radius <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$\sqrt{n}$">\(\sqrt{n}\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>, before scaling in the canonical basis directions.</p>
+</blockquote>
+<p>Interestingly, the projection is similar to LayerNorm, but &quot;1 dimension higher&quot;. Both functions normalise vector norms by projecting vectors onto a hypersphere of radius <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$\sqrt{n}$">\(\sqrt{n}\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>.</p>
+<ul>
+<li>LayerNorm: projects vectors onto an <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n-2)$">\((n-2)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>sphere embedded in an <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n-1)$">\((n-1)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>d hyperplane, before applying an element-wise affine transformation.</li>
+<li>RMSNorm: projects vectors onto an <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n-1)$">\((n-1)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>sphere embedded in the original <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n)$">\((n)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>d space, before applying an element-wise scaling.</li>
+</ul>
+<p>Furthermore, the difference in dimensionality between these 2 hyperspheres can help motivate why LayerNorm uses an affine transformation, whereas RMSNorm uses simple scaling.</p>
+<p>In RMSNorm, after projecting onto the hypersphere, no direction information is lost, only magnitude - all directions in vector space are still &quot;accessible&quot;. In other words, for any direction in activation space, there is an input vector where <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$\text{RMSNorm}(x)$">\(\text{RMSNorm}(x)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span> points in that direction.</p>
+<p>LayerNorm is more lossy, as it projects onto a lower-dimensional subspace. While it destroys magnitude information just like RMSNorm, it also loses an entire dimension of freedom. Including a shift transformation gives the network access to an operation that can &quot;reach&quot; all dimensions. However, it&#39;s important to note that, while the output of this element-wise affine transform is no-longer in a strict subspace, it is still in an affine subspace: Just because the shift can &quot;reach&quot; in every direction does not mean information lost in the projection can be recovered.</p>
+<blockquote>
+<p>side note: I wonder if we should we expect fewer SAE encoder weights to align with the main diagonal pre LayerNorm, as the mean subtraction destroys this dimension. Alternatively, might networks use this to their advantage by using the LayerNorm to &quot;delete&quot; a feature by aligning it with the main diagonal?</p>
+</blockquote>
+<p>In summary, both LayerNorm and RMSNorm can be described geometrically as projecting activation vectors onto an <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$r=\sqrt{n}$">\(r=\sqrt{n}\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span> hypersphere, then applying a simple operation. The key differences are as follows:</p>
+<ul>
+<li>The dimensionality of the hypersphere vectors are projected onto<ul>
+<li>in LayerNorm it&#39;s an <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n-2)$">\((n-2)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>sphere</li>
+<li>in RMSNorm it&#39;s an <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n-1)$">\((n-1)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>sphere</li>
+</ul>
+</li>
+<li>the transformation after projection onto the sphere<ul>
+<li>LayerNorm applies an element-wise affine transformation</li>
+<li>RMSNorm applies simpler element-wise scaling</li>
+</ul>
+</li>
+</ul>
+<p>It&#39;s also important to note that the invariance LayerNorm creates across the main diagonal is it&#39;s entire point, as it helps stabilise training. There&#39;s also a computational tradeoff: by not calculating or subtracting the vector mean, and by removing the shift, RMSNorm saves on both FLOPS and parameters.</p>
+<p>Importantly, LayerNorm can be equivalent to RMSNorm in certain cases. Ignoring shifting, for vectors that lie on the zero-sum hyperplane, both LayerNorm and RMSNorm project onto the same <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n-2)$">\((n-2)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>sphere and then do element-wise scaling. In other words, if we ignore the shift, there&#39;s a <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n-1)$">\((n-1)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>-dimensional subspace where the two operations are equivalent. Still, the difference in the main diagonal and the shift likely cause important mechanistic differences worth exploring.</p>
+<div class="graph-container" style="
+    width: 70vw;
+    margin: 0 auto;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+">
+    <iframe src="public/layernorm_animation.html" frameborder="0" style="width: 100%; aspect-ratio: 1;"></iframe>
+    <iframe src="public/rmsnorm_animation.html" frameborder="0" style="width: 100%; aspect-ratio: 1;"></iframe>
+</div>
+
+
+
+<hr>
+<section class="footnotes" data-footnotes>
+<h2 id="footnote-label" class="sr-only">Footnotes</h2>
+<ol>
+<li id="footnote-3">
+<p>zero-sum hyperplane (of an <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$n$">\(n\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>-dimensional space): the <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n-1)$">\((n-1)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>-dimensional hyperplane containing of all vectors whose components sum to 0. Importantly, it&#39;s orthogonal to the main diagonal. <a href="#footnote-ref-3" data-footnote-backref aria-label="Back to reference 3">↩</a></p>
+</li>
+<li id="footnote-2">
+<p><span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n-2)$">\((n-2)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>sphere: a sphere embedded in an <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n-1)$">\((n-1)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>-dimensional subspace: For example, in 3d, an <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n-2)$">\((n-2)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>sphere is a circle on a 2d subspace/plane <a href="#footnote-ref-2" data-footnote-backref aria-label="Back to reference 2">↩</a></p>
+</li>
+<li id="footnote-1">
+<p><span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n-1)$">\((n-1)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>sphere: a regular sphere in the <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$N$">\(N\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>-dimensional space, called <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n-1)$">\((n-1)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span> because it describes the surface of the sphere, which is <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n-1)$">\((n-1)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span> dimensional even though it exists within <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$N$">\(N\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>-dimensional space. For example in 3d, an <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n-1)$">\((n-1)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>sphere is a regular sphere, as the surface of the sphere is 2d, and in 2d, an <span class="math-container math-inline" onclick="copyMathToClipboard(this)" data-latex="$(n-1)$">\((n-1)\)<svg class="copy-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></span>sphere is a circle, as surface of the circle is 1d. <a href="#footnote-ref-1" data-footnote-backref aria-label="Back to reference 1">↩</a></p>
+</li>
+</ol>
+</section>
+
+</body>
+</html> 

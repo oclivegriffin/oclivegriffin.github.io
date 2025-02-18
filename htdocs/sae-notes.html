@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sparse Autoencoder Notes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']],
+                processEscapes: true
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async 
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+
+    <!-- Copy to clipboard -->
+    <script>
+        function copyMathToClipboard(element) {
+            const latex = element.getAttribute('data-latex');
+            navigator.clipboard.writeText(latex).then(() => {
+                element.style.opacity = '0.5';
+                setTimeout(() => element.style.opacity = '1', 200);
+            });
+        }
+    </script>
+</head>
+<body>
+    <p><strong><a href="./index.html">home</a></strong></p>
+<h1>Sparse Autoencoder Notes</h1>
+<p>Research into Sparse Autoencoders, (and more recently their variants) is a promising direction in AI interpretability. Particularly, SAEs strike an attractive balance between rigour and scalability.</p>
+<p>This is a very informal index of resources related to the current state of SAE research.</p>
+<p><strong>Code examples:</strong></p>
+<ul>
+<li>implementations<ul>
+<li>Samuel Marks <a href="https://github.com/saprmarks/dictionary_learning">https://github.com/saprmarks/dictionary_learning</a></li>
+<li>OpenAI <a href="https://github.com/openai/sparse_autoencoder">https://github.com/openai/sparse_autoencoder</a><ul>
+<li>includes cool distributed code</li>
+</ul>
+</li>
+<li><a href="https://github.com/jbloomAus/SAELens/blob/main/sae_lens/sae.py">SAELens</a> is an open-source library implementing</li>
+</ul>
+</li>
+<li>Callum McDougal&#39;s exercises <a href="https://www.lesswrong.com/posts/LnHowHgmrMbWtpkxx/intro-to-superposition-and-sparse-autoencoders-colab">here</a></li>
+</ul>
+<p><strong>Resources:</strong></p>
+<ul>
+<li>lesswrong tag: <a href="https://www.lesswrong.com/tag/sparse-autoencoders-saes?sortedBy=magic">https://www.lesswrong.com/tag/sparse-autoencoders-saes?sortedBy=magic</a></li>
+<li>[[SAE Landscape]]</li>
+<li>[[Transformer Circuits Thread]]</li>
+<li>maybe nice-ish overall blogpost: [[An Intuitive Explanation of Sparse Autoencoders for LLM Interpretability]]</li>
+<li>[[The engineering challenges of scaling interpretability]]</li>
+</ul>
+<p><strong>Variants:</strong></p>
+<ul>
+<li>base SAE<ul>
+<li>ReLU SAE (<a href="https://transformer-circuits.pub/2024/april-update/index.html#training-saes">Conerly et al.</a>)</li>
+<li>Gated SAE (<a href="https://arxiv.org/abs/2404.16014">paper</a>, SAELens Implementation)</li>
+<li>TopK SAEs (SAELens  <a href="https://github.com/jbloomAus/SAELens/blob/main/sae_lens/training/training_sae.py">here</a>)</li>
+<li>BatchTopK (lesswrong <a href="https://www.lesswrong.com/posts/Nkx6yWZNbAsfvic98/batchtopk-a-simple-improvement-for-topk-saes">here</a>)</li>
+<li>[[JumpReLU SAEs]]</li>
+<li>[[Efficient Dictionary Learning with Switch Sparse Autoencoders — LessWrong|Switch SAEs]]</li>
+<li>[[Tokenised SAEs]]</li>
+<li>end to end SAEs</li>
+<li>comparisons:<ul>
+<li><a href="https://transformer-circuits.pub/2024/june-update/index.html#topk-gated-comparison">https://transformer-circuits.pub/2024/june-update/index.html#topk-gated-comparison</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>[[Crosscoders]]<ul>
+<li>[[Sparse Crosscoders for Cross-Layer Features and Model Diffing]] </li>
+<li>[[Open Source Replication of Anthropic’s Crosscoder paper for model-diffing — LessWrong]]</li>
+</ul>
+</li>
+<li>[[Transcoders]]<ul>
+<li>[[Transcoders Find Interpretable LLM Feature Circuits]]</li>
+</ul>
+</li>
+</ul>
+<p><strong>Training:</strong></p>
+<ul>
+<li>pre-latent decoder bias subtraction: <a href="https://transformer-circuits.pub/2023/monosemantic-features/index.html#appendix-autoencoder">https://transformer-circuits.pub/2023/monosemantic-features/index.html#appendix-autoencoder</a></li>
+<li>update on how we train SAEs: <a href="https://transformer-circuits.pub/2024/april-update/index.html#training-saes">https://transformer-circuits.pub/2024/april-update/index.html#training-saes</a></li>
+<li>initialisation strategies<ul>
+<li>transpose</li>
+<li>norm 1</li>
+</ul>
+</li>
+<li>norm 1 decoder weights</li>
+<li>ghost grads</li>
+<li>dead latents / neurons / neuron resampling</li>
+</ul>
+<p><strong>Evaluation</strong></p>
+<ul>
+<li>metics</li>
+<li>downstream loss<ul>
+<li><a href="https://www.lesswrong.com/posts/8QRH8wKcnKGhpAu2o/examining-language-model-performance-with-reconstructed#comments">https://www.lesswrong.com/posts/8QRH8wKcnKGhpAu2o/examining-language-model-performance-with-reconstructed#comments</a></li>
+</ul>
+</li>
+</ul>
+<p><strong>Problems:</strong></p>
+<ul>
+<li>[[SAEs are highly dataset dependent a case study on the refusal direction — LessWrong]]</li>
+<li>[[Do sparse autoencoders find &quot;true features&quot;? — LessWrong]]</li>
+<li>[[SAE feature geometry is outside the superposition hypothesis — AI Alignment Forum]]</li>
+<li>[[Standard SAEs Might Be Incoherent A Choosing Problem &amp; A “Concise” Solution — LessWrong]]</li>
+<li>[[Feature Suppression in SAEs]]</li>
+</ul>
+<p><strong>Other</strong><br>Not sure where this goes but interesting: [[Interpretability as Compression Reconsidering SAE Explanations of Neural Activations with MDL-SAEs]]</p>
+
+</body>
+</html> 

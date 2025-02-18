@@ -1,0 +1,25 @@
+[
+    {
+        "source": "./content/pages/index.md",
+        "url_path": "index.html",
+        "title": "Oli Clive-Griffin"
+    },
+    {
+        "source": "/Users/oliclive-griffin/main/writing/blog/The Geometry of LayerNorm and RMSNorm.md",
+        "url_path": "normgeometry.html",
+        "title": "The Geometry of LayerNorm and RMSNorm",
+        "type": "blog"
+    },
+    {
+        "source": "/Users/oliclive-griffin/main/writing/blog/Deep Learning Links.md",
+        "url_path": "dl.html",
+        "title": "Deep learning Links",
+        "type": "blog"
+    },
+    {
+        "source": "/Users/oliclive-griffin/main/writing/blog/sparse autoencoders summary post.md",
+        "url_path": "sae-notes.html",
+        "title": "Sparse Autoencoder Notes",
+        "type": "blog"
+    }
+]

@@ -1,0 +1,54 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Oli Clive-Griffin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="index.css">
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']],
+                processEscapes: true
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async 
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        hljs.highlightAll();
+    </script>
+    <script>
+        function copyMathToClipboard(element) {
+            const latex = element.getAttribute('data-latex');
+            navigator.clipboard.writeText(latex).then(() => {
+                element.style.opacity = '0.5';
+                setTimeout(() => element.style.opacity = '1', 200);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>What I use</h1>
+<ul>
+<li>32GB Macbook Pro M1 Max</li>
+<li>Mouse: Logitech Mx Master 3s</li>
+<li>Keyboard: Keychron K2</li>
+<li>Editors: <a href="https://www.cursor.com/">Cursor</a> is magic, <a href="https://neovim.io/">NeoVim</a> (for quick editing)</li>
+<li><a href="https://iterm2.com/">iTerm2</a> with Zsh</li>
+<li><a href="https://www.raycast.com/">Raycast</a></li>
+<li><a href="https://brew.sh/">Homebrew</a></li>
+<li><a href="https://github.com/astral-sh/uv">UV</a> as a borderline magical replacement for pip</li>
+</ul>
+
+</body>
+</html> 
