@@ -2,13 +2,10 @@
 
 [Github](https://github.com/oclivegriffin), o [dot] clivegriffin [at] gmail [dot] com
 
-I'm currently on sabbatical, self-studying AI safety research engineering. I'm particularly interested in mechanistic interpretability.
+I'm currently working at [Goodfire](https://goodfire.ai) on [Parameter Decomposition](https://www.goodfire.ai/research/stochastic-param-decomp#)
 
-<!-- ### Posts
-- [The geometry of LayerNorm and RMSNorm](./ln.html) - A geometric perspective on LayerNorm and RMSNorm, exploring how they project vectors onto hyperspheres.
-
-### Notes
-- [SAE notes](./sae-notes.html) - Notes and resources on SAEs -->
+### Posts
+- [The geometry of LayerNorm and RMSNorm](./normgeometry.html) - A geometric perspective on LayerNorm and RMSNorm, exploring how they project vectors onto hyperspheres.
 
  ### Research / ML
 - [crosscode](https://github.com/oclivegriffin/crosscode) - A library for training Sparse Crosscoders, Transcoders, and SAEs.
